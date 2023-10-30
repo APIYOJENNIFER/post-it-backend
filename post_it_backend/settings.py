@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     # My apps
     'user',
     'api',
-    'group'
+    'group',
 
     # Django apps
     'rest_framework.authtoken',
