@@ -2,3 +2,6 @@ django
 djangorestframework
 psycopg2
 django-environ
+pylint
+flake8
+pylint-django
