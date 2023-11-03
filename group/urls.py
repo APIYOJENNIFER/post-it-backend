@@ -7,4 +7,5 @@ urlpatterns = [
     path('<int:group_id>/', GroupApiView.as_view()),
     path('detail/<int:group_id>/', GroupDetailApiView.as_view()),
     path('user/<int:user_id>/', GroupDetailApiView.as_view()),
+    path('<int:group_id>/message/', views.post_message),
 ]

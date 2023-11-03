@@ -12,7 +12,7 @@ from django.http import Http404
 
 
 from .models import Group
-from .serializers import GroupSerializer
+from .serializers import GroupSerializer, MessageSerializer
 
 
 class GroupApiView(ListAPIView):
@@ -147,3 +147,31 @@ class GroupDetailApiView(APIView):
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
+        
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def post_message(request, group_id):
+    """Post message to a group"""
+    if request.method == 'POST':
+        try:
+            group = Group.objects.get(id=group_id)
+            user = request.user
+        except Group.DoesNotExist:
+            return Response({"error":"Group not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if user in group.members.all():
+            data = {
+                "post": request.data.get("post"),
+                "group": group.id,
+                "user":user.id,
+            }
+        
+            serializer = MessageSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error":"User is not a member of this group"}, status=status.HTTP_403_FORBIDDEN)

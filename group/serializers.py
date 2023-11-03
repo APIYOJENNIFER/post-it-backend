@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from user.serializers import UserSerializer
-from .models import Group
+from .models import Group, Message
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -27,3 +27,10 @@ class GroupSerializer(serializers.ModelSerializer):
         instance.members.add(*member_objects)
         instance.save()
         return instance
+
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['id', 'post', 'group', 'user', 'created_at']
