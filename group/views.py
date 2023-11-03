@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 
 
-from .models import Group
+from .models import Group, Message
 from .serializers import GroupSerializer, MessageSerializer
 
 
@@ -210,3 +210,25 @@ def add_users(request, group_id):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+        
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def retrieve_messages(request, group_id):
+    if request.method == 'GET':
+        try:
+            group = Group.objects.get(id=group_id)
+            user = request.user
+        except Group.DoesNotExist:
+            return Response({"error":"Group not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if user in group.members.all():
+            messages = Message.objects.filter(group=group)
+
+            serializer = MessageSerializer(messages, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error":"User is not a member of this group"}, status=status.HTTP_403_FORBIDDEN)
