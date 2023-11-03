@@ -5,4 +5,5 @@ urlpatterns = [
     path('', views.create_group),
     path('<int:group_id>/user/', views.add_users),
     path('<int:group_id>/message/', views.post_message),
+    path('<int:group_id>/messages/', views.retrieve_messages),
 ]
