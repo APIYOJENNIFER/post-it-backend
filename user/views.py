@@ -31,8 +31,7 @@ def signin_user(request):
             return Response({
                 'error': 'username or password is incorrect'},
                 status=status.HTTP_401_UNAUTHORIZED)
-        token, _ = Token.objects.get_or_create(user=user)\
-            # pylint: disable=no-member
+        token, _ = Token.objects.get_or_create(user=user)
         return Response({
             'token': token.key},
             status=status.HTTP_200_OK)

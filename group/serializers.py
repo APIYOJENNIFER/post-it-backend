@@ -5,7 +5,7 @@ from .models import Group
 
 class GroupSerializer(serializers.ModelSerializer):
     """Group seerializer class"""
-    class Meta:  # pylint: disable=too-few-public-methods
+    class Meta:
         """Serializer Meta class"""
         model = Group
         fields = ['id', 'name', 'members', 'creator']
