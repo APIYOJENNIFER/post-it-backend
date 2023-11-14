@@ -49,3 +49,21 @@ def add_users(request, group_id):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return None
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_group(request, group_id):
+    """Delete a group"""
+    if request.method == 'DELETE':
+        try:
+            group = Group.objects.get(id=group_id)
+        except Group.DoesNotExist:
+            return Response({"error": "Group not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+        if request.user == group.creator:
+            group.delete()
+            return Response({"message": "Group deleted successfully"},
+                            status=status.HTTP_204_NO_CONTENT)
+        return Response({"error": "Only the group creator can delete"})
+    return None
