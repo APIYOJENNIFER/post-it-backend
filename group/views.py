@@ -37,6 +37,10 @@ def add_users(request):
         data.pop('name', None)
         try:
             group = Group.objects.get(id=group_id)
+            if request.user != group.creator:
+                return Response({
+                                "error": "Only group creator can add members"},
+                                status=status.HTTP_403_FORBIDDEN)
             errors = []
             for member in group.members.all():
                 if member.id not in data['members']:
