@@ -27,10 +27,11 @@ def create_group(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def add_users(request, group_id):
+def add_users(request):
     """Add user(s) to a group"""
     if request.method == 'POST':
         data = request.data.copy()
+        group_id = request.data.get("group_id")
 
         data.pop('creator', None)
         data.pop('name', None)
