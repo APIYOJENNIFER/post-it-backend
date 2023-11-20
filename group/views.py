@@ -37,29 +37,30 @@ def add_users(request):
         data.pop('name', None)
         try:
             group = Group.objects.get(id=group_id)
+            errors = []
+            for member in group.members.all():
+                if member.id not in data['members']:
+                    data['members'].append(member.id)
+            for member in data['members']:
+                try:
+                    user = User.objects.get(id=member)
+                    if user.id not in group.members.all()\
+                            .values_list('id', flat=True):
+                        group.members.add(user)
+                except User.DoesNotExist:
+                    errors.append(f"User with ID {member} is not found")
+            serializer = GroupSerializer(group, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            if errors:
+                return Response({"error": errors},
+                                status=status.HTTP_404_NOT_FOUND)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
-        errors = []
-        for member in group.members.all():
-            if member.id not in data['members']:
-                data['members'].append(member.id)
-        for member in data['members']:
-            try:
-                user = User.objects.get(id=member)
-                if user.id not in group.members.all().values_list('id',
-                                                                  flat=True):
-                    group.members.add(user)
-            except User.DoesNotExist:
-                errors.append(f"User with ID {member} is not found")
-        serializer = GroupSerializer(group, data=data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if errors:
-            return Response({"error": errors},
-                            status=status.HTTP_404_NOT_FOUND)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return None
 
 
