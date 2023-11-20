@@ -70,9 +70,10 @@ def add_users(request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def delete_group(request, group_id):
+def delete_group(request):
     """Delete a group"""
     if request.method == 'DELETE':
+        group_id = request.data.get("group_id")
         try:
             group = Group.objects.get(id=group_id)
         except Group.DoesNotExist:
