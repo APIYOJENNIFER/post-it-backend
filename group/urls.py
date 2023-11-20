@@ -6,5 +6,5 @@ urlpatterns = [
     path('', views.create_group),
     path('user/', views.add_users),
     path('delete/', views.delete_group),
-    path('<int:group_id>/remove/<int:user_id>', views.remove_user),
+    path('remove/', views.remove_user),
 ]
