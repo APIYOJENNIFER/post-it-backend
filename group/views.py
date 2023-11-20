@@ -25,11 +25,11 @@ def create_group(request):
     return None
 
 
-@api_view(['POST'])
+@api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def add_users(request):
     """Add user(s) to a group"""
-    if request.method == 'POST':
+    if request.method == 'PATCH':
         data = request.data.copy()
         group_id = request.data.get("group_id")
 
