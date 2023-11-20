@@ -76,14 +76,14 @@ def delete_group(request):
         group_id = request.data.get("group_id")
         try:
             group = Group.objects.get(id=group_id)
-        except Group.DoesNotExist:
-            return Response({"error": "Group not found"},
-                            status=status.HTTP_404_NOT_FOUND)
-        if request.user == group.creator:
+            if request.user != group.creator:
+                return Response({"error": "Only the group creator can delete"})
             group.delete()
             return Response({"message": "Group deleted successfully"},
                             status=status.HTTP_204_NO_CONTENT)
-        return Response({"error": "Only the group creator can delete"})
+        except Group.DoesNotExist:
+            return Response({"error": "Group not found"},
+                            status=status.HTTP_404_NOT_FOUND)
     return None
 
 
