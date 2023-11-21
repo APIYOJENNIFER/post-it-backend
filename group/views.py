@@ -1,20 +1,19 @@
 """views module"""
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from .models import Group
 from .serializers import GroupSerializer
 
-# Create your views here.
 
+class PostItGroupApiView(APIView):
+    """Define methods for performing actions on groups"""
+    permission_classes = [permissions.IsAuthenticated]
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def create_group(request):
-    """function based view for creating a group"""
-    if request.method == 'POST':
+    def post(self, request):
+        """Create a group"""
         data = request.data.copy()
         data['creator'] = request.user.id
         serializer = GroupSerializer(data=data)
@@ -22,14 +21,9 @@ def create_group(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    return None
 
-
-@api_view(['PATCH'])
-@permission_classes([IsAuthenticated])
-def add_users(request):
-    """Add user(s) to a group"""
-    if request.method == 'PATCH':
+    def patch(self, request):
+        """Update members list"""
         data = request.data.copy()
         group_id = request.data.get("group_id")
 
@@ -65,15 +59,9 @@ def add_users(request):
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
-    return None
 
-
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def delete_group(request):
-    """Delete a group"""
-    if request.method == 'DELETE':
-        group_id = request.data.get("group_id")
+    def delete(self, request, group_id):
+        """Delete a group"""
         try:
             group = Group.objects.get(id=group_id)
             if request.user != group.creator:
@@ -84,16 +72,17 @@ def delete_group(request):
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
-    return None
 
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def remove_user(request):
-    """Remove a user(s) from a group"""
-    if request.method == 'DELETE':
+class PostItGroupDetailApiView(APIView):
+    """
+    Define methods for performing detail and more specific actions on groups
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, user_id):
+        """Delete/Remove a user from a specific group"""
         group_id = request.data.get("group_id")
-        user_id = request.data.get("user_id")
         try:
             group = Group.objects.get(id=group_id)
             if request.user != group.creator:
@@ -119,4 +108,3 @@ def remove_user(request):
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
-    return None

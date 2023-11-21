@@ -1,10 +1,9 @@
 """urls module"""
 from django.urls import path
-from . import views
+from .views import PostItGroupApiView, PostItGroupDetailApiView
 
 urlpatterns = [
-    path('', views.create_group),
-    path('user/', views.add_users),
-    path('delete/', views.delete_group),
-    path('remove/', views.remove_user),
+    path('', PostItGroupApiView.as_view()),
+    path('<int:group_id>/', PostItGroupApiView.as_view()),
+    path('remove_user/<int:user_id>/', PostItGroupDetailApiView.as_view()),
 ]
