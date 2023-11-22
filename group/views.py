@@ -24,8 +24,8 @@ class PostItGroupApiView(APIView):
 
     def patch(self, request):
         """Update members list"""
-        data = request.data.copy()
-        group_id = request.data.get("group_id")
+        data = request.data
+        group_id = data.get("group_id")
 
         data.pop('creator', None)
         data.pop('name', None)
@@ -36,10 +36,7 @@ class PostItGroupApiView(APIView):
                                 "error": "Only group creator can add members"},
                                 status=status.HTTP_403_FORBIDDEN)
             errors = []
-            for member in group.members.all():
-                if member.id not in data['members']:
-                    data['members'].append(member.id)
-            for member in data['members']:
+            for member in data.get("members"):
                 try:
                     user = User.objects.get(id=member)
                     if user.id not in group.members.all()\
