@@ -86,22 +86,22 @@ class PostItGroupDetailApiView(APIView):
                 return Response({
                                 "error":
                                 "Only group creator can remove members"})
-            try:
-                user = User.objects.get(id=user_id)
-                if user == group.creator:
-                    return Response(
-                        {"error": "Cannot remove creator from the group"},
-                        status=status.HTTP_403_FORBIDDEN)
-                if user.id not in group.members.all().values_list('id',
-                                                                  flat=True):
-                    return Response(
-                        {"error": f"User with ID {user_id} not in this group"})
-                group.members.remove(user)
-            except User.DoesNotExist:
-                return Response({"error": f"User with ID {user_id} not found"},
-                                status=status.HTTP_404_NOT_FOUND)
-            return Response({"message": "Member(s) successfully removed"},
+            user = User.objects.get(id=user_id)
+            if user == group.creator:
+                return Response(
+                    {"error": "Cannot remove creator from the group"},
+                    status=status.HTTP_403_FORBIDDEN)
+            if user.id not in group.members.all().values_list('id',
+                                                              flat=True):
+                return Response(
+                    {"error": f"User with ID {user_id} not in this group"})
+            group.members.remove(user)
+            return Response({"message":
+                            f"User with ID {user_id} successfully removed"},
                             status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
+            return Response({"error": f"User with ID {user_id} not found"},
+                            status=status.HTTP_404_NOT_FOUND)
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
