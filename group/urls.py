@@ -5,5 +5,5 @@ from .views import GroupApiView, GroupDetailApiView
 urlpatterns = [
     path('', GroupApiView.as_view()),
     path('<int:group_id>/', GroupApiView.as_view()),
-    path('remove_user/<int:user_id>/', GroupDetailApiView.as_view()),
+    path('user/<int:user_id>/', GroupDetailApiView.as_view()),
 ]
