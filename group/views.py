@@ -8,7 +8,7 @@ from .models import Group
 from .serializers import GroupSerializer
 
 
-class PostItGroupApiView(APIView):
+class GroupApiView(APIView):
     """Define methods for performing actions on groups"""
     permission_classes = [permissions.IsAuthenticated]
 
@@ -71,7 +71,7 @@ class PostItGroupApiView(APIView):
                             status=status.HTTP_404_NOT_FOUND)
 
 
-class PostItGroupDetailApiView(APIView):
+class GroupDetailApiView(APIView):
     """
     Define methods for performing detail and more specific actions on groups
     """
