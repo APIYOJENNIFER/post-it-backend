@@ -1,11 +1,11 @@
 """views module"""
 from rest_framework.views import APIView
 from rest_framework import permissions
-from django.http import Http404
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
+from django.http import Http404
 from .models import Group
 from .serializers import GroupSerializer
 
@@ -15,13 +15,14 @@ class GroupApiView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self, request, group_id):
+        """Check for user permission and group existence"""
         try:
             group = Group.objects.get(id=group_id)
             if request.user != group.creator:
                 raise PermissionDenied("Access Denied")
             return group
-        except Group.DoesNotExist:
-            raise Http404
+        except Group.DoesNotExist as exc:
+            raise Http404 from exc
 
     def get(self, request):
         """Retrieve a list of all the groups"""
@@ -79,7 +80,7 @@ class GroupApiView(APIView):
             group = self.get_object(request, group_id)
             group.delete()
             return Response({"message": "Group deleted successfully"},
-                                status=status.HTTP_204_NO_CONTENT)
+                            status=status.HTTP_204_NO_CONTENT)
         except PermissionDenied:
             return Response({"error": "Only the group creator can delete"},
                             status=status.HTTP_403_FORBIDDEN)
