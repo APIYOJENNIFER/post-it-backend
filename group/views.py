@@ -94,6 +94,16 @@ class GroupDetailApiView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated]
 
+    def get(self, request, group_id):
+        """Retrieve a single group"""
+        try:
+            group = Group.objects.get(id=group_id)
+            serializer = GroupSerializer(group)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Group.DoesNotExist:
+            return Response({"error": "Group not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+
     def delete(self, request, user_id):
         """Delete/Remove a user from a specific group"""
         group_id = request.data.get("group_id")
