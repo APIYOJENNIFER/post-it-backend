@@ -1,6 +1,8 @@
 """views module"""
 from rest_framework.views import APIView
 from rest_framework import permissions
+from django.http import Http404
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
@@ -12,6 +14,15 @@ class GroupApiView(APIView):
     """Define methods for performing actions on groups"""
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_object(self, request, group_id):
+        try:
+            group = Group.objects.get(id=group_id)
+            if request.user != group.creator:
+                raise PermissionDenied("Access Denied")
+            return group
+        except Group.DoesNotExist:
+            raise Http404
+        
     def post(self, request):
         """Create a group"""
         data = request.data.copy()
@@ -30,11 +41,7 @@ class GroupApiView(APIView):
         data.pop('creator', None)
         data.pop('name', None)
         try:
-            group = Group.objects.get(id=group_id)
-            if request.user != group.creator:
-                return Response({
-                                "error": "Only group creator can add members"},
-                                status=status.HTTP_403_FORBIDDEN)
+            group = self.get_object(request, group_id)
             errors = []
             for member in data.get("members"):
                 try:
@@ -53,20 +60,24 @@ class GroupApiView(APIView):
                                 status=status.HTTP_404_NOT_FOUND)
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-        except Group.DoesNotExist:
+        except PermissionDenied:
+            return Response({"error": "Only group creator can add members"},
+                            status=status.HTTP_403_FORBIDDEN)
+        except Http404:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, group_id):
         """Delete a group"""
         try:
-            group = Group.objects.get(id=group_id)
-            if request.user != group.creator:
-                return Response({"error": "Only the group creator can delete"})
+            group = self.get_object(request, group_id)
             group.delete()
             return Response({"message": "Group deleted successfully"},
-                            status=status.HTTP_204_NO_CONTENT)
-        except Group.DoesNotExist:
+                                status=status.HTTP_204_NO_CONTENT)
+        except PermissionDenied:
+            return Response({"error": "Only the group creator can delete"},
+                            status=status.HTTP_403_FORBIDDEN)
+        except Http404:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
 
