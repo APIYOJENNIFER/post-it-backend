@@ -22,7 +22,13 @@ class GroupApiView(APIView):
             return group
         except Group.DoesNotExist:
             raise Http404
-        
+
+    def get(self, request):
+        """Retrieve a list of all the groups"""
+        groups = Group.objects.all()
+        serializer = GroupSerializer(groups, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def post(self, request):
         """Create a group"""
         data = request.data.copy()
