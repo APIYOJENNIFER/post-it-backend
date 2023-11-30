@@ -1,19 +1,22 @@
 """Serializer module"""
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Group
 from user.serializers import UserSerializer
+from .models import Group
+
 
 class GroupGetSerializer(serializers.ModelSerializer):
-    """Group seerializer class"""
+    """Group GET method serializer class"""
     members = UserSerializer(many=True)
+
     class Meta:
         """Serializer Meta class"""
         model = Group
         fields = ['id', 'name', 'members', 'creator']
 
+
 class GroupSerializer(serializers.ModelSerializer):
-    """Group seerializer class"""
+    """Group serializer class"""
     class Meta:
         """Serializer Meta class"""
         model = Group
