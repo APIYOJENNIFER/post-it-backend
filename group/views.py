@@ -33,8 +33,10 @@ class GroupApiView(APIView):
 
     def post(self, request):
         """Create a group"""
-        data = request.data.copy()
-        data['creator'] = request.user.id
+        data = request.data
+        user_id = request.user.id
+        data['creator'] = user_id
+        data['members'] = [user_id]
         serializer = GroupSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
