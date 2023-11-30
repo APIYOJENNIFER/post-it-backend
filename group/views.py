@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from .models import Group
 from .serializers import GroupSerializer
+from .serializers import GroupGetSerializer
 
 
 class GroupApiView(APIView):
@@ -27,7 +28,7 @@ class GroupApiView(APIView):
     def get(self, request):
         """Retrieve a list of all the groups"""
         groups = Group.objects.all()
-        serializer = GroupSerializer(groups, many=True)
+        serializer = GroupGetSerializer(groups, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -99,7 +100,7 @@ class GroupDetailApiView(APIView):
         """Retrieve a single group"""
         try:
             group = Group.objects.get(id=group_id)
-            serializer = GroupSerializer(group)
+            serializer = GroupGetSerializer(group)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
