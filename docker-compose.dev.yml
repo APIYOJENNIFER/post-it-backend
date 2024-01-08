@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=admin
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/postit
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - SECRET_KEY=<SECRET_KEY>
+      - DB_NAME=<DB_NAME>
+      - DB_USER=<DB_USER>
+      - DB_PASSWORD=<DB_PASSWORD>
+      - DB_HOST=<DB_HOST>
+      - DB_PORT=<DB_PORT>
+    tty: true
