@@ -16,8 +16,6 @@ ENV SECRET_KEY=${SECRET_KEY} \
     DB_HOST=${DB_HOST} \
     DB_PORT=${DB_PORT}
 
-RUN mkdir /postit
-
 WORKDIR /postit
 
 COPY requirements.txt .
