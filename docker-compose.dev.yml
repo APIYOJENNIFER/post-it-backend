@@ -2,7 +2,9 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_PASSWORD=admin
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    env_file:
+      - .env
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
@@ -13,10 +15,12 @@ services:
     depends_on:
       - db
     environment:
-      - SECRET_KEY=<SECRET_KEY>
-      - DB_NAME=<DB_NAME>
-      - DB_USER=<DB_USER>
-      - DB_PASSWORD=<DB_PASSWORD>
-      - DB_HOST=<DB_HOST>
-      - DB_PORT=<DB_PORT>
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+    env_file:
+      - .env
     tty: true
