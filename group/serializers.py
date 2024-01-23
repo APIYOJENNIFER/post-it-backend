@@ -5,22 +5,29 @@ from user.serializers import UserSerializer
 from .models import Group
 
 
-class GroupGetSerializer(serializers.ModelSerializer):
-    """Group GET method serializer class"""
-    members = UserSerializer(many=True)
+# class GroupGetSerializer(serializers.ModelSerializer):
+#     """Group GET method serializer class"""
+#     members = UserSerializer(many=True)
 
-    class Meta:
-        """Serializer Meta class"""
-        model = Group
-        fields = ['id', 'name', 'members', 'creator']
+#     class Meta:
+#         """Serializer Meta class"""
+#         model = Group
+#         fields = ['id', 'name', 'members', 'creator']
 
 
 class GroupSerializer(serializers.ModelSerializer):
     """Group serializer class"""
+    members = UserSerializer(many=True) # uncommented for serializing nested data
+
     class Meta:
         """Serializer Meta class"""
         model = Group
         fields = ['id', 'name', 'members', 'creator']
+        depth = 1
+
+    # def get_members(self, obj):
+    #     members = UserSerializer(obj.members, many=True, context=self.context).data
+    #     return members 
 
     def update(self, instance, validated_data):
         existing_members = instance.members.all()
