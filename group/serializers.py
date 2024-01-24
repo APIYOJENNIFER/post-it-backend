@@ -23,7 +23,6 @@ class GroupSerializer(serializers.ModelSerializer):
         """Serializer Meta class"""
         model = Group
         fields = ['id', 'name', 'members', 'creator']
-        depth = 1
 
     # def get_members(self, obj):
     #     members = UserSerializer(obj.members, many=True, context=self.context).data
