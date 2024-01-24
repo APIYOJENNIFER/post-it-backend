@@ -7,10 +7,8 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from django.http import Http404
 
-from user.serializers import UserSerializer
 from .models import Group
 from .serializers import GroupSerializer
-# from .serializers import GroupGetSerializer
 
 
 class GroupApiView(APIView):
@@ -30,37 +28,19 @@ class GroupApiView(APIView):
     def get(self, request):
         """Retrieve a list of all the groups"""
         groups = Group.objects.all()
-        serializer = GroupSerializer(groups, many=True, context={'request': request}) # added request context
+        serializer = GroupSerializer(groups, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         """Create a group"""
-        data = request.data
-
-        # user_id = request.user.id
-        user_serializer = UserSerializer(request.user)
-        user_data = user_serializer.data
-        user = request.user
-        print(f"{user_data} ldldldl")
-        data['creator'] = user.id
-        data['members'] = [user_data]
+        data = request.data.copy()
+        user_id = request.user.id
+        data['creator'] = user_id
         serializer = GroupSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # def post(self, request):
-    #     """Create a group"""
-    #     data = request.data
-    #     user_id = request.user.id
-    #     data['creator'] = user_id
-    #     data['members'] = [user_id]
-    #     serializer = GroupSerializer(data=data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request):
         """Update members list"""
