@@ -7,12 +7,17 @@ from .models import Group
 
 class GroupSerializer(serializers.ModelSerializer):
     """Group serializer class"""
-    members = UserSerializer(many=True, required=False)
 
     class Meta:
         """Serializer Meta class"""
         model = Group
         fields = ['id', 'name', 'members', 'creator']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['members'] = UserSerializer(
+                                    instance.members, many=True).data
+        return representation
 
     def update(self, instance, validated_data):
         existing_members = instance.members.all()

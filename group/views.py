@@ -36,6 +36,7 @@ class GroupApiView(APIView):
         data = request.data.copy()
         user_id = request.user.id
         data['creator'] = user_id
+        data['members'] = [user_id]
         serializer = GroupSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
