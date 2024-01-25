@@ -66,7 +66,7 @@ class GroupApiView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             if errors:
                 return Response({"error": errors},
-                                status=status.HTTP_404_NOT_FOUND)
+                                status=status.HTTP_304_NOT_MODIFIED)
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
         except PermissionDenied:
