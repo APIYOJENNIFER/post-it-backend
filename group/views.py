@@ -47,13 +47,14 @@ class GroupApiView(APIView):
         """Update members list"""
         data = request.data
         group_id = data.get("group_id")
+        members_ids = data.get("members")
 
         data.pop('creator', None)
         data.pop('name', None)
         try:
             group = self.get_object(request, group_id)
             errors = []
-            for member in data.get("members"):
+            for member in members_ids:
                 try:
                     user = User.objects.get(id=member)
                     if user.id not in group.members.all()\
