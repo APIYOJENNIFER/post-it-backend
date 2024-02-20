@@ -4,16 +4,23 @@ from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
+
 from django.contrib.auth.models import User
 from django.http import Http404
+
 
 from .models import Group
 from .serializers import GroupSerializer
 
 
-class GroupApiView(APIView):
+class GroupApiView(ListAPIView):
     """Define methods for performing actions on groups"""
     permission_classes = [permissions.IsAuthenticated]
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    pagination_class = PageNumberPagination
 
     def get_object(self, request, group_id):
         """Check for user permission and group existence"""
@@ -25,10 +32,14 @@ class GroupApiView(APIView):
         except Group.DoesNotExist as exc:
             raise Http404 from exc
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         """Retrieve a list of all the groups"""
-        groups = Group.objects.all()
-        serializer = GroupSerializer(groups, many=True)
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.serializer_class(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
