@@ -22,12 +22,13 @@ class GroupApiView(ListAPIView):
     serializer_class = GroupSerializer
     pagination_class = PageNumberPagination
 
-    def get_object(self, request, group_id):
+    def get_object(self, request=None, group_id=None):
         """Check for user permission and group existence"""
         try:
-            group = Group.objects.get(id=group_id)
-            if request.user != group.creator:
-                raise PermissionDenied("Access Denied")
+            if request and group_id is not None:
+                group = Group.objects.get(id=group_id)
+                if request.user != group.creator:
+                    raise PermissionDenied("Access Denied")
             return group
         except Group.DoesNotExist as exc:
             raise Http404 from exc
