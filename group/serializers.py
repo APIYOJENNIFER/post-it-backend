@@ -20,12 +20,10 @@ class GroupSerializer(serializers.ModelSerializer):
         return representation
 
     def update(self, instance, validated_data):
-        existing_members = instance.members.all()
         new_members = validated_data.get("members")
 
         for member in new_members:
-            if member not in existing_members:
-                user = User.objects.get(id=member)
-                instance.members.add(user)
+            user = User.objects.get(id=member.id)
+            instance.members.add(user)
         instance.save()
         return instance
