@@ -131,7 +131,7 @@ class GroupDetailApiView(APIView):
                                 "error":
                                 "Only group creator can remove members"})
             user = User.objects.get(id=user_id)
-            if user == group.creator:
+            if user.id == group.creator.id:
                 return Response(
                     {"error": "Cannot remove creator from the group"},
                     status=status.HTTP_403_FORBIDDEN)
