@@ -69,9 +69,7 @@ class GroupApiView(ListAPIView):
             for member in members_ids:
                 try:
                     user = User.objects.get(id=member)
-                    if user.id not in group.members.all()\
-                            .values_list('id', flat=True):
-                        group.members.add(user)
+                    group.members.add(user)
                 except User.DoesNotExist:
                     errors.append(f"User with ID {member} is not found")
             serializer = GroupSerializer(group, data=data, partial=True)
