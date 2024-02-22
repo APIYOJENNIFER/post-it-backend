@@ -22,8 +22,8 @@ class GroupSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         new_members = validated_data.get("members")
 
-        for member in new_members:
-            user = User.objects.get(id=member.id)
-            instance.members.add(user)
+        member_objects = User.objects.filter(
+            id__in=[member.id for member in new_members])
+        instance.members.add(*member_objects)
         instance.save()
         return instance
