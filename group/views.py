@@ -147,7 +147,6 @@ class GroupDetailApiView(APIView):
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
-        
 
     def post(self, request):
         """Post message to a group"""
@@ -158,7 +157,7 @@ class GroupDetailApiView(APIView):
             group = Group.objects.get(id=group_id)
             user = request.user
         except Group.DoesNotExist:
-            return Response({"error":"Group not found"},
+            return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
         except User.DoesNotExist:
             return Response({"error": "User not found"},
@@ -167,14 +166,14 @@ class GroupDetailApiView(APIView):
             data = {
                 "post": post,
                 "group": group.id,
-                "user":user.id,
+                "user": user.id,
             }
 
             serializer = MessageSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({"error":"User is not a member of this group"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "User is not a member of this group"},
+                        status=status.HTTP_403_FORBIDDEN)

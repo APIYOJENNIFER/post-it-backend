@@ -29,8 +29,9 @@ class GroupSerializer(serializers.ModelSerializer):
         return instance
 
 
-
 class MessageSerializer(serializers.ModelSerializer):
+    """Message serializer class"""
     class Meta:
+        """Message serializer Meta class"""
         model = Message
         fields = ['id', 'post', 'group', 'user', 'created_at']
