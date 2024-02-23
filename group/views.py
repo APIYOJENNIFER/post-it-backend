@@ -149,24 +149,27 @@ class GroupDetailApiView(APIView):
                             status=status.HTTP_404_NOT_FOUND)
         
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def post_message(request, group_id):
-    """Post message to a group"""
-    if request.method == 'POST':
+    def post(self, request):
+        """Post message to a group"""
+        data = request.data
+        group_id = data.get("group_id")
+        post = data.get("post")
         try:
             group = Group.objects.get(id=group_id)
             user = request.user
         except Group.DoesNotExist:
-            return Response({"error":"Group not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        if user in group.members.all():
+            return Response({"error":"Group not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+        if user.id in group.members.all().values_list("id", flat=True):
             data = {
-                "post": request.data.get("post"),
+                "post": post,
                 "group": group.id,
                 "user":user.id,
             }
-        
+
             serializer = MessageSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
