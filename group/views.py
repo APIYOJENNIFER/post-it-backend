@@ -148,6 +148,11 @@ class GroupDetailApiView(APIView):
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
 
+
+class MessageAPIView(APIView):
+    """Define methods for messaging within the group"""
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request):
         """Post message to a group"""
         data = request.data
