@@ -1,9 +1,9 @@
 """user urls module"""
 from django.urls import path
-from . import views
+from .views import UserSignupAPIView, UserSigninAPIView
 
 
 urlpatterns = [
-    path('signup/', views.create_user),
-    path('signin/', views.signin_user),
+    path('signup/', UserSignupAPIView.as_view()),
+    path('signin/', UserSigninAPIView.as_view()),
 ]
