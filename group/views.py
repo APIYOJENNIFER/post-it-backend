@@ -183,52 +183,24 @@ class MessageAPIView(APIView):
         return Response({"error": "User is not a member of this group"},
                         status=status.HTTP_403_FORBIDDEN)
 
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def add_users(request, group_id):
-    """Add user(s) to a group"""
-    if request.method == 'POST':
-        members = request.data.get('members')
-        try:
-            group = Group.objects.get(id=group_id)
-        except Group.DoesNotExist:
-            return Response({"error":"Group not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        for member in group.members.all():
-            if member.id not in members:
-                members.append(member.id)
-        
-        for member in members:
-            user = User.objects.get(id=member)
-            if user.id not in group.members.all().values_list('id', flat=True):
-                group.members.add(user)
-
-        serializer = GroupSerializer(group, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-
-
-        
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def retrieve_messages(request, group_id):
-    if request.method == 'GET':
+    def get(self, request):
+        """Retrieve all messages in a group"""
+        data = request.data
+        group_id = data.get("group_id")
         try:
             group = Group.objects.get(id=group_id)
             user = request.user
         except Group.DoesNotExist:
-            return Response({"error":"Group not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        if user in group.members.all():
+            return Response({"error": "Group not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        if user.id in group.members.all().values_list("id", flat=True):
             messages = Message.objects.filter(group=group)
 
             serializer = MessageSerializer(messages, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"error":"User is not a member of this group"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"error": "User is not a member of this group"},
+                        status=status.HTTP_403_FORBIDDEN)
