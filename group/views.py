@@ -183,13 +183,14 @@ class MessageAPIView(APIView):
         return Response({"error": "User is not a member of this group"},
                         status=status.HTTP_403_FORBIDDEN)
 
-    def get(self, request):
+    def get(self, request, user_id):
         """Retrieve all messages in a group"""
         data = request.data
         group_id = data.get("group_id")
         try:
             group = Group.objects.get(id=group_id)
-            user = request.user
+            user = User.objects.get(id=user_id)
+            user_id = user.id
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
@@ -197,7 +198,7 @@ class MessageAPIView(APIView):
             return Response({"error": "User not found"},
                             status=status.HTTP_404_NOT_FOUND)
 
-        if user.id in group.members.all().values_list("id", flat=True):
+        if user_id in group.members.all().values_list("id", flat=True):
             messages = Message.objects.filter(group=group)
 
             serializer = MessageSerializer(messages, many=True)
