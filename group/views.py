@@ -159,7 +159,7 @@ class MessageAPIView(APIView):
         group_id = data.get("group_id")
         post = data.get("post")
         try:
-            group = Group.objects.get(id=group_id)
+            group = Group.objects.select_related("creator").get(id=group_id)
             user = request.user
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
@@ -188,9 +188,8 @@ class MessageAPIView(APIView):
         data = request.data
         group_id = data.get("group_id")
         try:
-            group = Group.objects.get(id=group_id)
-            user = User.objects.get(id=user_id)
-            user_id = user.id
+            group = Group.objects.select_related("creator").get(id=group_id)
+            user = User.objects.select_related("auth_token").get(id=user_id)
         except Group.DoesNotExist:
             return Response({"error": "Group not found"},
                             status=status.HTTP_404_NOT_FOUND)
@@ -198,7 +197,7 @@ class MessageAPIView(APIView):
             return Response({"error": "User not found"},
                             status=status.HTTP_404_NOT_FOUND)
 
-        if user_id in group.members.all().values_list("id", flat=True):
+        if user.id in group.members.all().values_list("id", flat=True):
             messages = Message.objects.filter(group=group)
 
             serializer = MessageSerializer(messages, many=True)
