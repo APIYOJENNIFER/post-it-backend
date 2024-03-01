@@ -153,7 +153,7 @@ class MessageAPIView(APIView):
     """Define methods for messaging within the group"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         """Post message to a group"""
         data = request.data
         group_id = data.get("group_id")
@@ -183,10 +183,10 @@ class MessageAPIView(APIView):
         return Response({"error": "User is not a member of this group"},
                         status=status.HTTP_403_FORBIDDEN)
 
-    def get(self, request, user_id):
+    def get(self, request, *args, **kwargs):
         """Retrieve all messages in a group"""
-        data = request.data
-        group_id = data.get("group_id")
+        group_id = kwargs.get("group_id")
+        user_id = kwargs.get("user_id")
         try:
             group = Group.objects.select_related("creator").get(id=group_id)
             user = User.objects.select_related("auth_token").get(id=user_id)
