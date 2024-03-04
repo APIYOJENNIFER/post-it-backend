@@ -7,7 +7,7 @@ from .views import\
     MessageDetailAPIView
 
 urlpatterns = [
-    path('', GroupApiView.as_view()),
+    path('', GroupApiView.as_view(), name='group'),
     path('<int:group_id>/', GroupApiView.as_view()),
     path('detail/<int:group_id>/', GroupDetailApiView.as_view()),
     path('users/<int:user_id>/', GroupDetailApiView.as_view()),
