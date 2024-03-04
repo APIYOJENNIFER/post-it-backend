@@ -1,8 +1,9 @@
 import pytest
 from django.urls import reverse
+from rest_framework import status
 
 @pytest.mark.django_db
-def test_groups_api(client):
+def test_create_group_api(client):
     """
     Test groups api endpoints 
     :param client
@@ -14,5 +15,5 @@ def test_groups_api(client):
         "name":"test group"
     }
 
-    response_create = client.post(url, data=data, format="json")
-    assert response_create.status_code == 201
+    response = client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_201_CREATED
