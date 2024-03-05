@@ -24,3 +24,17 @@ def test_create_group_api(api_client, authenticate_user_with_token):
     api_client.credentials()
 
     assert response.status_code == status.HTTP_201_CREATED
+
+
+@pytest.mark.django_db
+def test_get_groups_api(api_client, authenticate_user_with_token):
+    """Test GET method for retrieving groups"""
+    token = authenticate_user_with_token()
+
+    url = reverse("group")
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.get(url)
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_200_OK
