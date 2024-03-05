@@ -35,7 +35,7 @@ class GroupApiView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         """Retrieve a list of all the groups"""
-        queryset = self.get_queryset()
+        queryset = self.get_queryset().order_by('id')
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.serializer_class(page, many=True)
