@@ -73,3 +73,20 @@ def test_group_delete_permission_denied(api_client,
     api_client.credentials()
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_group_delete_group_not_found(api_client,
+                                      authenticate_user_with_token):
+    """Test deletion if group is not existent"""
+    token = authenticate_user_with_token("testuser", "123",
+                                         "testuser@gmail.com")
+
+    url = reverse("group")
+    non_existent_group_id = 0
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.delete(f"{url}{non_existent_group_id}/")
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
