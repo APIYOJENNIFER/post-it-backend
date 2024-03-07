@@ -2,6 +2,7 @@
 import pytest
 from django.urls import reverse
 from rest_framework import status
+from group.models import Group
 
 
 @pytest.mark.django_db
@@ -28,10 +29,13 @@ def test_group_create(api_client, authenticate_user_with_token):
 
 
 @pytest.mark.django_db
-def test_group_list(api_client, authenticate_user_with_token):
+def test_group_list(api_client, authenticate_user_with_token, group_creator):
     """Test GET method for retrieving groups"""
     token = authenticate_user_with_token("testuser", "123",
                                          "testuser@gmail.com")
+
+    Group.objects.create(name="group 1", creator=group_creator)
+    Group.objects.create(name="group 2", creator=group_creator)
 
     url = reverse("group")
     api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -40,6 +44,8 @@ def test_group_list(api_client, authenticate_user_with_token):
     api_client.credentials()
 
     assert response.status_code == status.HTTP_200_OK
+    expected_size = Group.objects.count()
+    assert response.json().get('count') == expected_size
 
 
 @pytest.mark.django_db
