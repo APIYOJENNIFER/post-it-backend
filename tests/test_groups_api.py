@@ -56,3 +56,20 @@ def test_group_delete_success(api_client, authenticate_user_with_token,
     api_client.credentials()
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.django_db
+def test_group_delete_permission_denied(api_client,
+                                        authenticate_user_with_token,
+                                        test_group):
+    """Test for permission denied if user is not a group creator"""
+    token = authenticate_user_with_token("not_creator", "123",
+                                         "notcreator@gmail.com")
+
+    url = reverse("group")
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.delete(f"{url}{test_group.id}/")
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
