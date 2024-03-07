@@ -12,7 +12,8 @@ def test_create_group_api(api_client, authenticate_user_with_token):
     :return None
     """
 
-    token = authenticate_user_with_token()
+    token = authenticate_user_with_token("testuser", "123",
+                                         "testuser@gmail.com")
 
     url = reverse("group")
     data = {
@@ -29,7 +30,8 @@ def test_create_group_api(api_client, authenticate_user_with_token):
 @pytest.mark.django_db
 def test_get_groups_api(api_client, authenticate_user_with_token):
     """Test GET method for retrieving groups"""
-    token = authenticate_user_with_token()
+    token = authenticate_user_with_token("testuser", "123",
+                                         "testuser@gmail.com")
 
     url = reverse("group")
     api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -38,3 +40,19 @@ def test_get_groups_api(api_client, authenticate_user_with_token):
     api_client.credentials()
 
     assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_group_delete_success(api_client, authenticate_user_with_token,
+                              test_group):
+    """Test successful group deletion"""
+    token = authenticate_user_with_token("test_creator", "123",
+                                         "testcreator@gmail.com")
+
+    url = reverse("group")
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.delete(f"{url}{test_group.id}/")
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
