@@ -5,7 +5,7 @@ from rest_framework import status
 
 
 @pytest.mark.django_db
-def test_create_group_api(api_client, authenticate_user_with_token):
+def test_group_create(api_client, authenticate_user_with_token):
     """
     Test create group api endpoint
     :param client
@@ -28,7 +28,7 @@ def test_create_group_api(api_client, authenticate_user_with_token):
 
 
 @pytest.mark.django_db
-def test_get_groups_api(api_client, authenticate_user_with_token):
+def test_group_list(api_client, authenticate_user_with_token):
     """Test GET method for retrieving groups"""
     token = authenticate_user_with_token("testuser", "123",
                                          "testuser@gmail.com")
