@@ -200,3 +200,22 @@ def test_group_add_members_group_not_found(api_client,
     api_client.credentials()
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.django_db
+def test_group_retrieve_single_group(api_client,
+                                     authenticate_user_with_token,
+                                     group_creator):
+    """Test GET method for retrieving a single group"""
+    token = authenticate_user_with_token("test_creator", "123",
+                                         "testcreator@gmail.com")
+
+    group = Group.objects.create(name="group 1", creator=group_creator)
+
+    url = reverse("group", kwargs={"group_id": group.id})
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.get(url)
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_200_OK
