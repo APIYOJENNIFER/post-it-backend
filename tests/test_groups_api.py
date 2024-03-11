@@ -149,3 +149,28 @@ def test_group_add_members_permission_denied(api_client,
     api_client.credentials()
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_group_add_members_bad_request(api_client,
+                                       authenticate_user_with_token,
+                                       group_creator):
+    """
+    Test for non existent user when adding new members to a group
+    """
+    token = authenticate_user_with_token("test_creator", "123",
+                                         "testcreator@gmail.com")
+    group = Group.objects.create(name="group 1", creator=group_creator)
+    non_existent_user_id = 0
+
+    url = reverse("group")
+    data = {
+        "members": [non_existent_user_id],
+        "group_id": group.id
+    }
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.patch(url, data=data, format="json")
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
