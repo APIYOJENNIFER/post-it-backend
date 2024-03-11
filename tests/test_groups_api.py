@@ -123,3 +123,29 @@ def test_group_add_members_successful(api_client,
     api_client.credentials()
 
     assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_group_add_members_permission_denied(api_client,
+                                             authenticate_user_with_token,
+                                             group_creator):
+    """
+    Test permission denied when adding new members to a group
+    """
+    token = authenticate_user_with_token("not_creator", "123",
+                                         "notcreator@gmail.com")
+    group = Group.objects.create(name="group 1", creator=group_creator)
+    user_1 = User.objects.create_user("user_1", "123", "user_1@gmail.com")
+    user_2 = User.objects.create_user("user_2", "123", "user_2@gmail.com")
+
+    url = reverse("group")
+    data = {
+        "members": [user_1.id, user_2.id],
+        "group_id": group.id
+    }
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.patch(url, data=data, format="json")
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
