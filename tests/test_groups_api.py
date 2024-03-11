@@ -174,3 +174,29 @@ def test_group_add_members_bad_request(api_client,
     api_client.credentials()
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test_group_add_members_group_not_found(api_client,
+                                           authenticate_user_with_token,
+                                           group_creator):
+    """
+    Test group not found when adding new members to a group
+    """
+    token = authenticate_user_with_token("test_creator", "123",
+                                         "testcreator@gmail.com")
+    user_1 = User.objects.create_user("user_1", "123", "user_1@gmail.com")
+
+    non_existent_group_id = 0
+
+    url = reverse("group")
+    data = {
+        "members": [user_1.id],
+        "group_id": non_existent_group_id
+    }
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.patch(url, data=data, format="json")
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
