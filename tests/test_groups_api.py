@@ -1,6 +1,7 @@
 """Test cases for groups APIs"""
 import pytest
 from django.urls import reverse
+from django.contrib.auth.models import User
 from rest_framework import status
 from group.models import Group
 
@@ -96,3 +97,29 @@ def test_group_delete_group_not_found(api_client,
     api_client.credentials()
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.django_db
+def test_group_add_members_successful(api_client,
+                                      authenticate_user_with_token,
+                                      group_creator):
+    """
+    Test successful addition of new members to a group by the group creator
+    """
+    token = authenticate_user_with_token("test_creator", "123",
+                                         "testcreator@gmail.com")
+    group = Group.objects.create(name="group 1", creator=group_creator)
+    user_1 = User.objects.create_user("user_1", "123", "user_1@gmail.com")
+    user_2 = User.objects.create_user("user_2", "123", "user_2@gmail.com")
+
+    url = reverse("group")
+    data = {
+        "members": [user_1.id, user_2.id],
+        "group_id": group.id
+    }
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.patch(url, data=data, format="json")
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_200_OK
