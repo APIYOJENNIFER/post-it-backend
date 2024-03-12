@@ -219,3 +219,27 @@ def test_group_retrieve_single_group(api_client,
     api_client.credentials()
 
     assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_group_successful_delete_user(api_client,
+                                      authenticate_user_with_token,
+                                      group_creator):
+    """Test successful removal of a user(s) from group"""
+    token = authenticate_user_with_token("test_creator", "123",
+                                         "testcreator@gmail.com")
+
+    group = Group.objects.create(name="group 1", creator=group_creator)
+    user = User.objects.create_user("user_to_delete", "123",
+                                    "usertodelete@gmail.com")
+    group.members.set([user])
+
+    url = reverse("group", kwargs={"user_id": user.id})
+    data = {"group_id": group.id}
+
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.delete(url, data=data, format="json")
+
+    api_client.credentials()
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
