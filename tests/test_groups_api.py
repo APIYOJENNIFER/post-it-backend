@@ -243,3 +243,27 @@ def test_group_successful_delete_user(api_client,
     api_client.credentials()
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.django_db
+def test_group_only_creator_delete_user(api_client,
+                                        authenticate_user_with_token,
+                                        group_creator):
+    """Test that only group creator can remove a user(s) from group"""
+    token = authenticate_user_with_token("testuser", "123",
+                                         "testuser@gmail.com")
+
+    group = Group.objects.create(name="group 1", creator=group_creator)
+    user = User.objects.create_user("user_to_delete", "123",
+                                    "usertodelete@gmail.com")
+    group.members.set([user])
+
+    url = reverse("group", kwargs={"user_id": user.id})
+    data = {"group_id": group.id}
+
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.delete(url, data=data, format="json")
+    error = response.json().get("error")
+    assert error == "Only group creator can remove members"
+
+    api_client.credentials()
