@@ -267,3 +267,26 @@ def test_group_only_creator_delete_user(api_client,
     assert error == "Only group creator can remove members"
 
     api_client.credentials()
+
+
+@pytest.mark.django_db
+def test_group_cannot_remove_creator_from_group(api_client,
+                                                authenticate_user_with_token,
+                                                group_creator):
+    """Test that group creator cannot be removed from group"""
+    token = authenticate_user_with_token("test_creator", "123",
+                                         "testcreator@gmail.com")
+
+    group = Group.objects.create(name="group 1", creator=group_creator)
+    group.members.set([group_creator])
+
+    url = reverse("group", kwargs={"user_id": group_creator.id})
+    data = {"group_id": group.id}
+
+    api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    response = api_client.delete(url, data=data, format="json")
+    error = response.json().get("error")
+    assert error == "Cannot remove creator from the group"
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    api_client.credentials()
