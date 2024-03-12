@@ -6,3 +6,4 @@ psycopg2==2.9.9
 pylint==3.0.2
 pylint-django==2.5.5
 pytest-django==4.8.0
+drf-yasg==1.21.7
