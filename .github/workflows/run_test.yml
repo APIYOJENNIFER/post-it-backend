@@ -27,7 +27,8 @@ jobs:
         run: |
           pylint --ignore=migrations group
           pylint --ignore=migrations user
-          flake8 user, group
+          flake8 group
+          flake8 user
       - name: Test with pytest
         run: coverage run -m pytest -v -s
       - name: Generate coverage report
