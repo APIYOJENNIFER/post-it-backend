@@ -30,6 +30,8 @@ jobs:
           flake8 group
           flake8 user
       - name: Test with pytest
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: coverage run -m pytest -v -s
       - name: Generate coverage report
         run: coverage report -m
