@@ -24,7 +24,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Lint with pylint and flake8
-        working-directory: post-it-backend
         run: |
           pylint --ignore=migrations group
           pylint --ignore=migrations user
