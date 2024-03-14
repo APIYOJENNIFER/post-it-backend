@@ -26,8 +26,9 @@ jobs:
       - name: Lint with pylint and flake8
         working-directory: post-it-backend
         run: |
-          pylint user/*.py, group/*.py
-          flake8 user/*.py, group/*.py
+          pylint --ignore=migrations group
+          pylint --ignore=migrations user
+          flake8 user, group
       - name: Test with pytest
         run: coverage run -m pytest -v -s
       - name: Generate coverage report
