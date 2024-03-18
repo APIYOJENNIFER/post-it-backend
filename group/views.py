@@ -183,6 +183,11 @@ class MessageAPIView(APIView):
         return Response({"error": "User is not a member of this group"},
                         status=status.HTTP_403_FORBIDDEN)
 
+
+class MessageDetailAPIView(APIView):
+    """Define methods for messaging within the group"""
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         """Retrieve all messages in a group"""
         group_id = kwargs.get("group_id")
